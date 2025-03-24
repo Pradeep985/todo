@@ -1,41 +1,26 @@
 const db = require("../config/db");
 
-class Todo {
-  static getTodos(userId) {
-    return db.query("SELECT * FROM todos WHERE user_id = ?", [userId])
-      .then(([result]) => result)
-      .catch((err) => {
-        console.error("Error fetching todos:", err);
-        return [];
-      });
-  }
+// Get all tasks
+exports.getAllTasks = (callback) => {
+  db.query("SELECT * FROM tasks", callback);
+};
 
-  static createTodo(userId, task) {
-    return db.query("INSERT INTO todos (user_id, task) VALUES (?, ?)", [userId, task])
-      .then(([result]) => result.insertId)
-      .catch((err) => {
-        console.error("Error creating todo:", err);
-        return null;
-      });
-  }
+// Get a single task
+exports.getTaskById = (id, callback) => {
+  db.query("SELECT * FROM tasks WHERE id = ?", [id], callback);
+};
 
-  static updateTodo(id, task) {
-    return db.query("UPDATE todos SET task = ? WHERE id = ?", [task, id])
-      .then(() => true)
-      .catch((err) => {
-        console.error("Error updating todo:", err);
-        return false;
-      });
-  }
+// Add a new task
+exports.createTask = (task, callback) => {
+  db.query("INSERT INTO tasks (task) VALUES (?)", [task], callback);
+};
 
-  static deleteTodo(id) {
-    return db.query("DELETE FROM todos WHERE id = ?", [id])
-      .then(() => true)
-      .catch((err) => {
-        console.error("Error deleting todo:", err);
-        return false;
-      });
-  }
-}
+// Update a task
+exports.updateTask = (id, task, callback) => {
+  db.query("UPDATE tasks SET task = ? WHERE id = ?", [task, id], callback);
+};
 
-module.exports = Todo;
+// Delete a task
+exports.deleteTask = (id, callback) => {
+  db.query("DELETE FROM tasks WHERE id = ?", [id], callback);
+};

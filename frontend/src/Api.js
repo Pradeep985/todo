@@ -7,9 +7,16 @@ export const register = (username, email, password) =>
   axios.post(`${API_URL}/auth/register`, { username, email, password });
 
 // Login user with email and password
-export const login = (email, password) => 
-  axios.post(`${API_URL}/auth/login`, { email, password });
-
+export const login = async (email, password) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+    console.log("Login Response:", response.data); // Debug API response
+    return response;
+  } catch (error) {
+    console.error("Login Error:", error.response?.data?.error || error.message);
+    throw error;
+  }
+};
 // Get all todos (requires authentication)
 export const getTodos = (token) => 
   axios.get(`${API_URL}/todos`, { headers: { Authorization: `Bearer ${token}` } });

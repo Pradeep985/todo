@@ -1,26 +1,24 @@
 const db = require("../config/db");
 
-class User {
-  static findByEmail(email) {
-    return db.query("SELECT * FROM users WHERE email = ?", [email])
-      .then(([result]) => result[0])
-      .catch((err) => {
-        console.error("Error fetching user:", err);
-        return null;
-      });
-  }
+const User = {
+  createUser: (username, email, password, callback) => {
+    const checkUserSql = "SELECT * FROM users WHERE email = ?";
+    db.query(checkUserSql, [email], (err, results) => {
+      if (err) return callback(err, null);
+      if (results.length > 0) return callback(new Error("User already exists"), null);
 
-  static createUser(username, email, hashedPassword) {
-    return db.query(
-      "INSERT INTO users (username, email, password) VALUES (?, ?, ?)", 
-      [username, email, hashedPassword]
-    )
-    .then(([result]) => result.insertId)
-    .catch((err) => {
-      console.error("Error inserting user:", err);
-      return null;
+      const sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+      db.query(sql, [username, email, password], callback);
     });
-  }
-}
+  },
+
+  getUserByEmail: (email, callback) => {
+    const sql = "SELECT * FROM users WHERE email = ?";
+    db.query(sql, [email], (err, results) => {
+      if (err) return callback(err, null);
+      callback(null, results.length > 0 ? results[0] : null);
+    });
+  },
+};
 
 module.exports = User;
